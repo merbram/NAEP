@@ -6,6 +6,7 @@ format:
     number-sections: true
     toc: true
     toc-depth: 2
+    keep-md: true
     echo: true
     warning: false
     message: false
@@ -66,6 +67,34 @@ While individual student scores are not available, the aggregated subgroup score
 This analysis was conducted using two separate data sets and all cleaning, visualization, and statistical analysis was done using R Studio. The first data set contained the variables year, state, race, and aggregated score by gender. The second data set contained the variables year, state, gender, and aggregated score by economic status.
 
 In order to prepare the data for analysis, both data sets were cleaned and converted to long format using the pivot.longer function in tidyverse. The two data sets were then merged by their common variables of year, state, and gender.
+
+```{r}
+library(tidyverse)
+summary_table <- NAEP_combined_long %>%
+  group_by(GroupType, Group, Year) %>%
+  summarize(
+    Mean_Score = round(mean(Score, na.rm = TRUE), 1),
+    SD = round(sd(Score, na.rm = TRUE), 1),
+    N = n(),
+    .groups = "drop"
+  )
+
+
+```{r results='asis'}
+library(kableExtra)
+library(dplyr)
+summary_table %>%
+  mutate(Year = as.character(Year)) %>%
+  kable(
+    format = "latex",
+    booktabs = TRUE,
+    caption = "Average NAEP Math Score by Demographic Group and Year",
+    col.names = c("Group Type", "Group", "Year", "Mean Score", "SD", "N"),
+    align = "llccrr"
+  ) %>%
+  kable_styling(latex_options = c("striped", "hold_position")) %>%
+  collapse_rows(columns = 1:2, latex_hline = "major", valign = "top")
+```
 ---
 
 ## Quarto
