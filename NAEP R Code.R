@@ -84,7 +84,7 @@ table1 <- NAEP_combined_long %>%
     N = n(),
     .groups = "drop"
   )
-
+table1
     #Table 2 -- Avg Score by Year #
 
 table2 <- NAEP_combined_long %>%
@@ -92,33 +92,33 @@ table2 <- NAEP_combined_long %>%
   summarize(
     Mean_Score = round(mean(Score, na.rm=TRUE), 1),
     SD = round(sd(Score, na.rm=TRUE), 1),
-    N = n()
-  ) %>%
-  kable(caption = "Average NAEP Math Score by Year")
-
+    N = n(),
+    .groups = "drop"
+  ) 
+table2
 
     #Summary Table 3 -- Avg Score by Gender # 
-
 table3 <- NAEP_combined_long %>%
-  group_by (Gender) %>% 
+  group_by(Year, Gender) %>%
   summarize(
-    Mean_Score = round(mean(Score, na.rm=TRUE), 1),
-    SD = round(sd(Score, na.rm=TRUE), 1),
-    N = n()
-  ) %>%
-  kable(caption = "Average NAEP Math Score by Gender")
-
+    Mean_Score = round(mean(Score, na.rm = TRUE), 1),
+    SD = round(sd(Score, na.rm = TRUE), 1),
+    N = n(),
+    .groups = "drop"
+  )
+table3
+str(table3)
      #Summary Table 4 -- Avg Score by Economic Status #
 table4 <- NAEP_combined_long %>%
   filter(GroupType == "Econ_Status") %>%
-  group_by (Group) %>% 
+  group_by (Year, Group) %>% 
   summarize(
     Mean_Score = round(mean(Score, na.rm=TRUE), 1),
     SD = round(sd(Score, na.rm=TRUE), 1),
-    N = n()
-  ) %>%
-  kable(caption = "Average NAEP Math Score by Economic Status")
-
+    N = n(),
+    .groups = "drop"
+  ) 
+table4
 ## GRAPHIC DISPLAYS ##
 
 ## Grpahic 1: Map of US with 2024 average scores ##
@@ -144,11 +144,74 @@ state_scores_2024 <- NAEP_combined_long %>%
 state_scores_2024 <- state_scores_2024 %>%
   filter(!is.na(state))
 
-plot_usmap(data = state_scores_2024, values = "Avg_Score", color = "white") +
+figure1_heatmap <- plot_usmap(data = state_scores_2024, values = "Avg_Score", color = "white") +
   scale_fill_gradient(low = "#deebf7",  # light blue
                       high = "#08306b",, name = "Avg Score") +
   labs(title = "Average 8th Grade Math NAEP Score by State (2024)") +
   theme(legend.position = "right")
+
+figure1_heatmap
+
+# Figure 2 -- Diverging Bar Graph for Change in Score 2022-2024
+
+score_diff_by_state <- NAEP_combined_long %>%
+  filter(Year %in% c(2022, 2024)) %>%
+  group_by(State, Year) %>%
+  summarize(Avg_Score = mean(Score, na.rm = TRUE), .groups = "drop") %>%
+  pivot_wider(names_from = Year, values_from = Avg_Score, names_prefix = "Year_") %>%
+  mutate(
+    Change = Year_2024 - Year_2022,
+    Change_Direction = ifelse(Change > 0, "Increase", "Decrease")
+  ) %>%
+  arrange(Change)
+
+figure2_change <- ggplot(score_diff_by_state, aes(x = reorder(State, Change), y = Change, fill = Change_Direction)) +
+  geom_col() +
+  geom_text(
+    aes(label = round(Change, 1)),
+    hjust = ifelse(score_diff_by_state$Change > 0, -0.2, 1.2),
+    size = 3
+  ) +
+  scale_fill_manual(
+    values = c("Increase" = "#2171b5", "Decrease" = "#de2d26"),
+    guide = guide_legend(reverse = TRUE)
+  ) +
+  geom_hline(yintercept = 0, color = "gray40", linetype = "dashed") +
+  coord_flip() +
+  labs(
+    title = "Change in 8th Grade NAEP Math Scores by State (2022 to 2024)",
+    subtitle = "States with score increases are shown in blue; decreases in red",
+    x = NULL,
+    y = "Score Change",
+    fill = "Change Direction"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.y = element_text(size = 8),
+    plot.title = element_text(face = "bold", size = 14),
+    plot.subtitle = element_text(size = 11),
+    legend.position = "bottom"
+  )
+
+#Line Graph of score by Year 
+score_by_year <- NAEP_combined_long %>%
+  group_by(Year) %>%
+  summarize(
+    Avg_Score = round(mean(Score, na.rm = TRUE), 1),
+    .groups = "drop"
+  )
+
+
+figure3_by_year <- ggplot(score_by_year, aes(x = Year, y = Avg_Score)) +
+  geom_line(color = "#2c7fb8", size = 1.2) +
+  geom_point(size = 3, color = "#2c7fb8") +
+  labs(
+    title = "Average NAEP 8th Grade Math Score by Year",
+    x = "Year",
+    y = "Average Score"
+  ) +
+  theme_minimal(base_size = 13)
+figure3_by_year
 
 ## Time Series of Score Changes by Gender ##
 
@@ -160,7 +223,7 @@ gender_scores <- NAEP_combined_long %>%
     .groups = "drop"
   )
 
-ggplot(gender_scores, aes(x = Year, y = Avg_Score, color = Gender)) +
+figure4_gender <- ggplot(gender_scores, aes(x = Year, y = Avg_Score, color = Gender)) +
   geom_line(size = 1.2) +
   geom_point(size = 2) +
   labs(
@@ -173,6 +236,7 @@ ggplot(gender_scores, aes(x = Year, y = Avg_Score, color = Gender)) +
   scale_color_manual(values = c("Female" = "red", "Male" = "blue")) +
   scale_x_continuous(breaks = c(2019, 2022, 2024))
 
+figure4_gender
 ## Time Series of Score Changes by Race ##
 
 race_scores <- NAEP_combined_long %>%
@@ -192,9 +256,10 @@ race_scores_clean <- race_scores %>%
     "Asian/Pacific Islander",
     "American Indian/Native American",
     "Two or More Races"
-  )))
+  ))) %>%
+filter(!is.na(Race))
 
-ggplot(race_scores, aes(x = Year, y = Avg_Score, color = Race)) +
+figure5_race <- ggplot(race_scores_clean, aes(x = Year, y = Avg_Score, color = Race)) +
   geom_line(size = 1.2) +
   geom_point(size = 2) +
   labs(
@@ -209,12 +274,11 @@ ggplot(race_scores, aes(x = Year, y = Avg_Score, color = Race)) +
     "White" = "#8da0cb",                   # soft blue
     "Black" = "#fc8d62",                   # muted orange
     "Hispanic" = "#a6d854",                # light green
-    "Asian/Pacific Islander" = "#66c2a5",  # teal
-    "American Indian/Native American" = "#e78ac3", # light pink
-    "Two or More Races" = "#ffd92f"        # soft yellow
-  ), drop=FALSE) +
+    "Asian/Pacific Islander" = "#66c2a5" # teal
+  ), drop=TRUE) +
   theme(legend.position = "right")
 
+figure5_race
 ## Statistical Analysis ##
 
 ## One Way ANOVA to Compare Mean Score by Race ##
@@ -235,16 +299,6 @@ group_means <- Naep_2024 %>%
 tukey_result <- TukeyHSD(anova_model)
 tukey_letters <- multcompLetters4(anova_model, tukey_result)
 group_means$Tukey_Group <- tukey_letters$Group$Letters
-
-figure4 <- ggplot(group_means, aes(x = reorder(Group, Mean_Score), y = Mean_Score)) +
-  geom_bar(stat = "identity", fill = "#4a90e2") +
-  geom_text(aes(label = Tukey_Group), vjust = -0.5, size = 4, color = "black") +
-  labs(
-    title = "Average NAEP Math Score by Race (with Tukey Grouping)",
-    x = "Race/Ethnicity",
-    y = "Mean Score"
-  ) +
-  theme_minimal()
 
 
 ## T Test to Compare Gender Differences ## 
