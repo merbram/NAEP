@@ -8,23 +8,23 @@ library(janitor)
 ## Import Datasets ##
 library(readxl)
 NAEP_data1 <- read_excel("~/Documents/NAEP data--all states by gender race.xls")
-glimpse(NAEP_data1)
+#glimpse(NAEP_data1)
 
 NAEP_data2<- read_excel("~/Downloads/NAEP Econ Status by Gender.xls", na=".")
-glimpse(NAEP_data2)
+#glimpse(NAEP_data2)
 
-str(NAEP_data1)
-str(NAEP_data2)
+#str(NAEP_data1)
+#str(NAEP_data2)
 
 ## Clean Up Datasets and Remove Missing Values ##
 colnames(NAEP_data1) <- c("Year", "State", "Race", "Male_Score", "Female_Score")
-str(NAEP_data1)
+#str(NAEP_data1)
 colnames(NAEP_data2) <- c("Year", "State", "Gender","EconDis", "NotEconDis")
-str(NAEP_data2)
+#str(NAEP_data2)
 
 NAEP_clean1 <- NAEP_data1 %>%
   filter(!is.na(Male_Score) , !is.na(Female_Score)) 
-str(NAEP_clean1)
+#str(NAEP_clean1)
 
 ## Convert Dataset1 to Long From and Clean Up ##
 library(tidyr)
@@ -47,8 +47,8 @@ NAEP_data2_long <- NAEP_data2 %>%
     Econ_Status =ifelse(Econ_Status=="EconDis", "Disadvantaged", "NotDisadvantaged"),
     Score = as.numeric(Score)
   )
-str(NAEP_data1_long)
-str(NAEP_data2_long)
+#str(NAEP_data1_long)
+#str(NAEP_data2_long)
 
 ## Set Up Group Type in Order to Merge Datasets 1 and 2 ## 
 race_data <- NAEP_data1_long %>%
@@ -67,22 +67,27 @@ econ_data <- NAEP_data2_long %>%
 
 ## Put the two together ## 
 NAEP_combined_long <- bind_rows(race_data, econ_data)
-glimpse(NAEP_combined_long)
+#glimpse(NAEP_combined_long)
 
 ## General Overview of Data ##
 library (knitr)
 library(dplyr)
 
-NAEP_combined_long %>%
+
+## Create summary tables ##
+    #Table 1--Avg Score by Demographic Group and Year #
+table1 <- NAEP_combined_long %>%
   group_by(GroupType, Group, Year) %>%
   summarize(
     Mean_Score = round(mean(Score, na.rm = TRUE), 1),
     SD = round(sd(Score, na.rm = TRUE), 1),
-    N = n()
-  ) %>% 
-  kable(caption = "Average NAEP Math Score by Demoegraphic Group and Year")
+    N = n(),
+    .groups = "drop"
+  )
 
-NAEP_combined_long %>%
+    #Table 2 -- Avg Score by Year #
+
+table2 <- NAEP_combined_long %>%
   group_by (Year) %>% 
   summarize(
     Mean_Score = round(mean(Score, na.rm=TRUE), 1),
@@ -91,7 +96,10 @@ NAEP_combined_long %>%
   ) %>%
   kable(caption = "Average NAEP Math Score by Year")
 
-NAEP_combined_long %>%
+
+    #Summary Table 3 -- Avg Score by Gender # 
+
+table3 <- NAEP_combined_long %>%
   group_by (Gender) %>% 
   summarize(
     Mean_Score = round(mean(Score, na.rm=TRUE), 1),
@@ -100,7 +108,8 @@ NAEP_combined_long %>%
   ) %>%
   kable(caption = "Average NAEP Math Score by Gender")
 
-NAEP_combined_long %>%
+     #Summary Table 4 -- Avg Score by Economic Status #
+table4 <- NAEP_combined_long %>%
   filter(GroupType == "Econ_Status") %>%
   group_by (Group) %>% 
   summarize(
@@ -209,6 +218,8 @@ ggplot(race_scores, aes(x = Year, y = Avg_Score, color = Race)) +
 ## Statistical Analysis ##
 
 ## One Way ANOVA to Compare Mean Score by Race ##
+install.packages("multcompView")
+library(multcompView)
 
 Naep_2024 <- NAEP_combined_long %>%
   filter(Year == 2024, GroupType == "Race", !is.na(Score), !is.na(Group))
@@ -217,7 +228,15 @@ anova_model <- aov(Score ~ Group, data = Naep_2024)
 summary(anova_model)
 TukeyHSD(anova_model)
 
-ggplot(group_means, aes(x = reorder(Race, Mean_Score), y = Mean_Score)) +
+group_means <- Naep_2024 %>%
+  group_by(Group) %>%
+  summarize(Mean_Score = mean(Score, na.rm = TRUE))
+  
+tukey_result <- TukeyHSD(anova_model)
+tukey_letters <- multcompLetters4(anova_model, tukey_result)
+group_means$Tukey_Group <- tukey_letters$Group$Letters
+
+figure4 <- ggplot(group_means, aes(x = reorder(Group, Mean_Score), y = Mean_Score)) +
   geom_bar(stat = "identity", fill = "#4a90e2") +
   geom_text(aes(label = Tukey_Group), vjust = -0.5, size = 4, color = "black") +
   labs(
@@ -226,6 +245,7 @@ ggplot(group_means, aes(x = reorder(Race, Mean_Score), y = Mean_Score)) +
     y = "Mean Score"
   ) +
   theme_minimal()
+
 
 ## T Test to Compare Gender Differences ## 
 
@@ -236,4 +256,4 @@ Gender_2024 <- NAEP_combined_long %>%
 
 t.test(Score ~ Gender, data = Gender_2024)
 
-
+tinytex::is_tinytex()

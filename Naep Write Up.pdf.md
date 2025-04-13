@@ -16,6 +16,9 @@ format:
 editor: visual
 ---
 
+
+
+
 INTRODUCTION
 
 The National Assessment of Educational Progress (NAEP), often referred to as "The Nation's Report Card", is a congressionaly mandated standardized test that is administered annually to 4th, 8th, and 12th grade students across the nation. Overseen and administered by the National Center for Education Statistics, NAEP is the only assessment that allows for nationwide comparisons of all students, including both public and private school attendees, in a variety of subjects across demographic groups. Since its first administration in 1969, this test has provided valuable information to educators and policymakers on student progress, achievement gaps, and changes in educational outcomes.
@@ -70,56 +73,58 @@ This analysis was conducted using two separate data sets and all cleaning, visua
 
 In order to prepare the data for analysis, both data sets were cleaned and converted to long format using the pivot.longer function in tidyverse. The two data sets were then merged by their common variables of year, state, and gender. 
 
-```{r}
-options(repos = c(CRAN = "https://cran.rstudio.com"))
-install.packages("multcompView")
-source("NAEP R Code.R")
+
+
+::: {.cell}
+::: {.cell-output .cell-output-stdout}
 
 ```
+
+The downloaded binary packages are in
+	/var/folders/wq/3cc17sjx3rs30v6fnk8d09h40000gn/T//Rtmpy3WpXQ/downloaded_packages
+```
+
+
+:::
+
+::: {.cell-output .cell-output-stdout}
+
+```
+
+The downloaded binary packages are in
+	/var/folders/wq/3cc17sjx3rs30v6fnk8d09h40000gn/T//Rtmpy3WpXQ/downloaded_packages
+```
+
+
+:::
+:::
+
+
 
 Summary statistics were computed for the state, year, and demographic variables. Tables 1-4 
 
-```{r results='asis', message=FALSE, warning=FALSE}
-library(kableExtra)
-library(dplyr)
-
-table1 <- NAEP_combined_long %>%
-  group_by(GroupType, Group, Year) %>%
-  summarize(
-    Mean_Score = round(mean(Score, na.rm = TRUE), 1),
-    SD = round(sd(Score, na.rm = TRUE), 1),
-    N = n(),
-    .groups = "drop"
-  )
-
-table1 %>%
-  filter(GroupType=="Econ_Status") %>%
-  select(-GroupType) %>% 
-  mutate(Year = as.character(Year)) %>% 
-  kable(
-    format = "latex",
-    booktabs = TRUE,
-    caption = "Average NAEP Math Score by Economic Status and Year",
-    col.names = c("Economic Status", "Year", "Mean Score", "SD", "N"),
-    align = "llccrr"
-  ) %>%
-  kable_styling(latex_options = c("striped", "hold_position"))
-
-table2 %>%
-  filter(GroupType=="Race") %>%
-  select(-GroupType) %>% 
-  mutate(Year = as.character(Year)) %>% 
-  kable(
-    format = "latex",
-    booktabs = TRUE,
-    caption = "Average NAEP Math Score by Race and Year",
-    col.names = c("Race", "Year", "Mean Score", "SD", "N"),
-    align = "llccrr"
-  ) %>%
-  kable_styling(latex_options = c("striped", "hold_position"))
 
 
-```
+\begin{table}[!h]
+\centering
+\caption{\label{tab:unnamed-chunk-2}Average NAEP Math Score by Demographic Group and Year}
+\centering
+\begin{tabular}[t]{llccrr}
+\toprule
+Group Type & Economic Status & Year & Mean Score & SD & N\\
+\midrule
+\cellcolor{gray!10}{Econ\_Status} & \cellcolor{gray!10}{Disadvantaged} & \cellcolor{gray!10}{2019} & \cellcolor{gray!10}{265.2} & \cellcolor{gray!10}{7.5} & \cellcolor{gray!10}{108}\\
+Econ\_Status & Disadvantaged & 2022 & 258.0 & 8.2 & 108\\
+\cellcolor{gray!10}{Econ\_Status} & \cellcolor{gray!10}{Disadvantaged} & \cellcolor{gray!10}{2024} & \cellcolor{gray!10}{256.5} & \cellcolor{gray!10}{8.3} & \cellcolor{gray!10}{108}\\
+Econ\_Status & NotDisadvantaged & 2019 & 294.4 & 5.2 & 108\\
+\cellcolor{gray!10}{Econ\_Status} & \cellcolor{gray!10}{NotDisadvantaged} & \cellcolor{gray!10}{2022} & \cellcolor{gray!10}{284.3} & \cellcolor{gray!10}{10.0} & \cellcolor{gray!10}{108}\\
+\addlinespace
+Econ\_Status & NotDisadvantaged & 2024 & 285.0 & 10.7 & 108\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
 
 ---
 
@@ -131,15 +136,36 @@ Quarto enables you to weave together content and executable code into a finished
 
 When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
 
-```{r}
-1 + 1
+
+
+::: {.cell}
+::: {.cell-output .cell-output-stdout}
+
 ```
+[1] 2
+```
+
+
+:::
+:::
+
+
 
 You can add options to executable code like this
 
-```{r}
-#| echo: false
-2 * 2
+
+
+::: {.cell}
+::: {.cell-output .cell-output-stdout}
+
 ```
+[1] 4
+```
+
+
+:::
+:::
+
+
 
 The `echo: false` option disables the printing of code (only output is displayed).
