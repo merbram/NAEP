@@ -335,6 +335,47 @@ Gender_2024 <- NAEP_combined_long %>%
 
 t.test(Score ~ Gender, data = Gender_2024)
 
+## T Test to Compare Economic Status Differences ## 
 
+Econ_2024 <- NAEP_combined_long %>%
+  filter(Year == 2024, GroupType == "Econ_Status") %>%
+  select(Group, Score) %>%
+  filter(!is.na(Score), Group %in% c("NotDisadvantaged", "Disadvantaged"))
 
-tinytex::is_tinytex()
+t.test(Score ~ Group, data = Econ_2024)
+
+## Regression Analysis ##
+
+## Separate data sets so I can remerge for regression ## 
+race_data <- NAEP_combined_long %>%
+  filter(GroupType == "Race") %>%
+  select(Year, State, Gender, Race = Group, Score)
+
+econ_data <- NAEP_combined_long %>%
+  filter(GroupType == "Econ_Status") %>%
+  select(Year, State, Gender, Econ_Status = Group, Score)
+
+merged_data <- left_join(race_data, econ_data, by = c("Year", "State", "Gender"), suffix = c("_Race", "_Econ"))
+
+regression_data <- merged_data %>%
+  filter(!is.na(Race), !is.na(Econ_Status), !is.na(Score_Race))
+
+regression_data <- regression_data %>%
+  rename(Score = Score_Race)
+
+regression_data <- regression_data %>%
+  filter(
+    Race %in% c("White", "Black", "Hispanic", "Asian/Pacific Islander"),
+    Econ_Status %in% c("Disadvantaged", "NotDisadvantaged")
+  ) %>%
+  mutate(
+    Gender = factor(Gender),
+    Race = factor(Race),
+    Econ_Status = factor(Econ_Status)
+  )
+
+model <- lm(Score ~ Year + Gender + Race + Econ_Status, data = regression_data)
+summary(model)
+
+model2 <- lm(Score ~ Year + Econ_Status, data=regression_data)
+summary(model2)
