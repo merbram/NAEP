@@ -199,14 +199,37 @@ A one-way ANOVA was conducted to examine differences in 2024 math scores by race
 
 
 
-
-
 ::: {.cell}
 ::: {.cell-output-display}
 ![](Naep-Write-Up_files/figure-pdf/unnamed-chunk-5-1.pdf)
 :::
 :::
 
+
+
+The achievement gap in test scores by economic status has steadily remained about a 30 point difference between those students who are economically disadvantaged and not economically disadvantaged. Across all three years, econmically disadvantaged students scored significantly lower than their non-economically disadvantged peers. As in the case of racial disparity, the root cause of this gap is not COVID-19, but rather it further deepend a long-standing disparity in achievement due to disparity in economic status. 
+
+
+
+::: {.cell}
+::: {.cell-output-display}
+![](Naep-Write-Up_files/figure-pdf/unnamed-chunk-6-1.pdf)
+:::
+:::
+
+
+
+After controlling for year, gender, and race, the regression model shows a significant decline in NAEP math scores over time, a small but significant advantage for male students, and large racial disparities, particularly for Black and Hispanic students relative to Asian students. Surprisingly, once these other factors are accounted for, economic status was not a significant predictor, which may indicate that race and year account for more of the variance in scores.
+
+
+A linear regression model examining Year and Economic Status as predictors of math scores revealed a strong association between socioeconomic background and achievement. Students not classified as economically disadvantaged scored approximately X points higher, on average, than their disadvantaged peers (p < 0.001). This reinforces long-standing research on the role of economic inequality in academic outcomes.
+
+in a simplified regression model, economic disadvantage was strongly associated with lower math scores. However, when controlling for race and gender, the effect of economic status became statistically insignificant, suggesting that race may be a stronger predictor of achievement disparities in this sample. This aligns with prior research showing how socioeconomic and racial disparities are closely intertwined in educational outcomes.
+
+**Interpretation**
+
+This persistent gap reinforces the need for targeted academic recovery efforts, especially for historically marginalized groups that may have had less access to digital learning resources and consistent instruction during the pandemic.
+Together, the trends in this figure highlight both the scale of post-pandemic learning loss and the uneven pace of recovery across racial groups.
 
 
 ---

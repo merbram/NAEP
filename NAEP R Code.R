@@ -369,13 +369,10 @@ regression_data <- regression_data %>%
     Econ_Status %in% c("Disadvantaged", "NotDisadvantaged")
   ) %>%
   mutate(
-    Gender = factor(Gender),
-    Race = factor(Race),
-    Econ_Status = factor(Econ_Status)
+    Gender = factor(Gender, levels = c("Female", "Male")),                # Reference: Female
+    Race = factor(Race, levels = c("Black", "Hispanic", "White", "Asian/Pacific Islander")),  # Reference: Black
+    Econ_Status = factor(Econ_Status, levels = c("Disadvantaged", "NotDisadvantaged"))        # Reference: Disadvantaged
   )
-
 model <- lm(Score ~ Year + Gender + Race + Econ_Status, data = regression_data)
 summary(model)
 
-model2 <- lm(Score ~ Year + Econ_Status, data=regression_data)
-summary(model2)
