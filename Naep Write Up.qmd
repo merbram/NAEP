@@ -140,11 +140,17 @@ figure2_change
 
 While the pandemic certainly disrupted learning for all students, those effects were not proportionally distributed. Gender, race, and economic disparities that already existed were amplified in the wake of the pandemic. 
 
-Prior to the pandemic, the national average 8th grade math scores for males and females were about the same. Post-pandemic, an achievement gap between genders appears to have widened and has worsend into 2024. While the scores seem to be diverging, a t-test for mean differences by gender did not yield a statistically significant result, t(355) = -1.203, p = .223. This suggests that although there may be a slight widening of the gender gap in math performance, the difference may not be large or consistent enough across students to conclude that a true gender-based difference exists in the overall population.
+Prior to the pandemic, the national average 8th grade math scores for males and females were roughly the same. Post-pandemic, an achievement gap between genders appears to have widened and has worsened into 2024. While the scores seem to be diverging, a t-test for mean differences by gender did not yield a statistically significant result, t(355) = -1.203, p = .223. This suggests that although there may be a slight widening of the gender gap in math performance, the difference may not be large enough across students to conclude that a true gender-based difference exists in the overall population.
  
 ```{r}
 figure4_gender
 ```
+
+In 2024, Asian/Pacific Islander students had the highest average score (300.7) while Black students had the lowest average score (250.5), a difference of 50.2 points, likely indicating that Asian/Pacific Islander students are significantly more proficient in basic mathematical and problem-solving skills. And while all races showed a large drop in average scores from 2019 to 2022, White and Asian/Pacific Islander students showed improvement in 2024 scores while Black and Hispanic student scores continued to decline. 
+
+A one-way ANOVA was conducted to examine differences in 2024 math scores by race, and results showed a statistically significant difference in at least one group mean, F(5, 325) = 217.3, p < .001. A follow-up Tukey’s HSD test confirmed that the mean scores for each racial group were significantly different from one another. While disparities in NAEP math scores by race are not new, the pandemic appears to have intensified the existing achievement gap. Though COVID-19 wasn’t the root cause of these differences, it acted as a catalyst that magnified long-standing inequities in access to quality instruction, academic resources, and educational support systems.
+
+
 
 ```{r}
 figure5_race

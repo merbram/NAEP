@@ -213,6 +213,7 @@ figure3_by_year <- ggplot(score_by_year, aes(x = Year, y = Avg_Score)) +
   theme_minimal(base_size = 13)
 figure3_by_year
 
+
 ## Time Series of Score Changes by Gender ##
 
 gender_scores <- NAEP_combined_long %>%
@@ -279,6 +280,30 @@ figure5_race <- ggplot(race_scores_clean, aes(x = Year, y = Avg_Score, color = R
   theme(legend.position = "right")
 
 figure5_race
+
+## Time Series Graph of changes in score by Econ Status ##
+econ_scores <- NAEP_combined_long %>%
+  filter(GroupType == "Econ_Status") %>%
+  group_by(Year, Econ_Status = Group) %>%
+  summarize(
+    Avg_Score = round(mean(Score, na.rm = TRUE), 1),
+    .groups = "drop"
+  )
+
+figure6_econ <- ggplot(econ_scores, aes(x = Year, y = Avg_Score, color = Econ_Status)) +
+  geom_line(size = 1.2) +
+  geom_point(size = 2) +
+  labs(
+    title = "Average NAEP Math Score by Economic Status (2019–2024)",
+    x = "Year",
+    y = "Average Score",
+    color = "Economic Status"
+  ) +
+  theme_minimal() +
+  scale_color_manual(values = c("Disadvantaged" = "#fc8d62", "NotDisadvantaged" = "#66c2a5")) +
+  scale_x_continuous(breaks = c(2019, 2022, 2024))
+figure6_econ 
+
 ## Statistical Analysis ##
 
 ## One Way ANOVA to Compare Mean Score by Race ##
@@ -309,5 +334,7 @@ Gender_2024 <- NAEP_combined_long %>%
   filter(!is.na(Score), Gender %in% c("Male", "Female"))
 
 t.test(Score ~ Gender, data = Gender_2024)
+
+
 
 tinytex::is_tinytex()
